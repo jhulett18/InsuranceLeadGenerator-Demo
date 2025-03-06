@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Generator</title>
+</head>
+<body>
+    <h1>Insurance Lead Excel Generator</h1>
+    <button onclick="getData()">Fetch Data</button>
+    <p id="output"></p>
+
+    <script>
+        function getData() {
+            fetch('https://your-railway-app-url.up/api/data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('output').innerText = JSON.stringify(data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
