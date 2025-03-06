@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Management Dashboard</title>
+    <title>Insurance Lead Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,6 +32,12 @@
             font-size: 28px;
         }
         
+        .download-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
         .download-btn {
             background-color: #1a1a1a;
             color: white;
@@ -92,8 +98,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Dashboard</h1>
-            <button class="download-btn" id="downloadBtn">
+            <h1>Insurance Lead Generator - DEMO</h1>
+            <button class="download-btn" id="downloadBtn" disabled>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
@@ -104,9 +110,11 @@
         </div>
         
         <div class="overview">
-            <h2>Application Overview</h2>
+            <h2>Saving Insurers Time</h2>
             <p class="description">
-                This dashboard provides a comprehensive view of your inventory management system. The table below displays your current product catalog with details on pricing and stock levels. You can download this data in Excel format using the download button above.
+                This tool will scan various websites and collect expiring insurance leads for insurers to call. When I built this 
+                in 2022, most people were copy-pasting each row of data into a spreadsheet, wasting 5+ hours of manual entry. I set
+                on a journey to automate this process, and provide them a clean spreadsheet, delivered right in their inbox every week.
             </p>
         </div>
         
@@ -186,7 +194,22 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('inventoryTable').style.display = 'table';
         }
+        
+          // Function to enable the download button
+    function enableDownloadButton() {
+        document.getElementById('downloadBtn').disabled = false;
+    }
+    
+    // Call this function after your data is loaded
+    async function initDashboard() {
+        const data = await fetchInventoryData();
+        if (data) {
+            populateTable(data);
+            enableDownloadButton(); // Enable button only after data is loaded
+        }
+    }
 
+    
         // Function to handle Excel download
         function downloadExcel() {
             // Basic Excel export - in a real app you'd use a proper library

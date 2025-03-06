@@ -1,0 +1,58 @@
+[
+    {
+      "id": 1,
+      "name": "Product A",
+      "category": "Electronics",
+      "price": 299.99,
+      "stock": 45
+    },
+    {
+      "id": 2,
+      "name": "Product B",
+      "category": "Furniture",
+      "price": 599.99,
+      "stock": 12
+    },
+    {
+      "id": 3,
+      "name": "Product C",
+      "category": "Clothing",
+      "price": 49.99,
+      "stock": 89
+    },
+    {
+      "id": 4,
+      "name": "Product D",
+      "category": "Electronics",
+      "price": 199.99,
+      "stock": 23
+    },
+    {
+      "id": 5,
+      "name": "Product E",
+      "category": "Home Goods",
+      "price": 129.99,
+      "stock": 34
+    },
+    {
+      "id": 6,
+      "name": "Product F",
+      "category": "Clothing",
+      "price": 79.99,
+      "stock": 56
+    },
+    {
+      "id": 7,
+      "name": "Product G",
+      "category": "Furniture",
+      "price": 899.99,
+      "stock": 7
+    },
+    {
+      "id": 8,
+      "name": "Product H",
+      "category": "Electronics",
+      "price": 349.99,
+      "stock": 18
+    }
+  ]
