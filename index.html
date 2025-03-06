@@ -3,22 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lead Generator</title>
+    <title>Inventory Management Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        
+        .download-btn {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .description {
+            margin-bottom: 20px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f8f8;
+            font-weight: normal;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .price {
+            text-align: right;
+        }
+        
+        .stock {
+            text-align: right;
+        }
+        
+        .category {
+            color: #8B4513;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Insurance Lead Excel Generator</h1>
-    <button onclick="getData()">Fetch Data</button>
-    <p id="output"></p>
+    <div class="container">
+        <div class="header">
+            <h1>Dashboard</h1>
+            <button class="download-btn" id="downloadBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download Excel
+            </button>
+        </div>
+        
+        <div class="overview">
+            <h2>Application Overview</h2>
+            <p class="description">
+                This dashboard provides a comprehensive view of your inventory management system. The table below displays your current product catalog with details on pricing and stock levels. You can download this data in Excel format using the download button above.
+            </p>
+        </div>
+        
+        <div id="loading">Loading inventory data...</div>
+        
+        <table id="inventoryTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th class="price">Price</th>
+                    <th class="stock">Stock</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Table rows will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
 
     <script>
-        function getData() {
-            fetch('https://your-railway-app-url.up/api/data')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('output').innerText = JSON.stringify(data);
-                })
-                .catch(error => console.error('Error:', error));
+        // Function to fetch inventory data from JSON file
+        async function fetchInventoryData() {
+            try {
+                // Path to your JSON file in your GitHub repository
+                const response = await fetch('data/inventory.json');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('loading').textContent = 'Error loading inventory data. Please try again later.';
+                return null;
+            }
         }
+
+        // Function to populate the table with data
+        function populateTable(data) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = ''; // Clear existing content
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Create and append table cells
+                const idCell = document.createElement('td');
+                idCell.textContent = item.id;
+                row.appendChild(idCell);
+                
+                const nameCell = document.createElement('td');
+                nameCell.textContent = item.name;
+                row.appendChild(nameCell);
+                
+                const categoryCell = document.createElement('td');
+                categoryCell.textContent = item.category;
+                categoryCell.className = 'category';
+                row.appendChild(categoryCell);
+                
+                const priceCell = document.createElement('td');
+                priceCell.textContent = `$${item.price.toFixed(2)}`;
+                priceCell.className = 'price';
+                row.appendChild(priceCell);
+                
+                const stockCell = document.createElement('td');
+                stockCell.textContent = item.stock;
+                stockCell.className = 'stock';
+                row.appendChild(stockCell);
+                
+                // Add the row to the table
+                tableBody.appendChild(row);
+            });
+            
+            // Show the table and hide loading message
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('inventoryTable').style.display = 'table';
+        }
+
+        // Function to handle Excel download
+        function downloadExcel() {
+            // Basic Excel export - in a real app you'd use a proper library
+            // This is a simplified example
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "ID,Name,Category,Price,Stock\n";
+            
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = Array.from(cells).map(cell => {
+                    // Remove $ from price for Excel
+                    let data = cell.textContent;
+                    if (cell.classList.contains('price')) {
+                        data = data.replace('$', '');
+                    }
+                    // Escape quotes and wrap in quotes if it contains a comma
+                    if (data.includes(',')) {
+                        data = `"${data.replace(/"/g, '""')}"`;
+                    }
+                    return data;
+                }).join(',');
+                csvContent += rowData + '\n';
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'inventory_data.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initialize the dashboard
+        async function initDashboard() {
+            const data = await fetchInventoryData();
+            if (data) {
+                populateTable(data);
+            }
+            
+            // Add event listener to download button
+            document.getElementById('downloadBtn').addEventListener('click', downloadExcel);
+        }
+
+        // Run when page loads
+        document.addEventListener('DOMContentLoaded', initDashboard);
     </script>
 </body>
 </html>
