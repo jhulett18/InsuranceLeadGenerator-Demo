@@ -1,10 +1,10 @@
 "use client";
 import Image from "next/image";
 // import supabase from '@/app/api/supabase';
-import { fetchEvents } from '@/app/api/supabase';
+import { fetchLeads } from '@/app/api/supabase';
 
 const handleButtonClick = async () => {
-  fetchEvents();
+  fetchLeads();
 };
 
 export default function Home() {

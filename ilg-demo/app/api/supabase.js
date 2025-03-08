@@ -1,30 +1,36 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, setAuth } from '@supabase/supabase-js';
+import { Sign } from 'crypto';
 
 // Initialize Supabase client
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_KEY);
 
 
-export const fetchEvents = async () => {
-    try {
-      const { data, error } = await supabase.from('instruments').select('*');
+
+export const fetchLeads = async () => {
+    
   
+  
+  try {
+      const {  data, error } = await supabase.from('2025MAYLEADS').select('*');
+
+
       // Checks for errors
       if (error) {
         console.error('Error fetching: ', error);
-        window.alert("No events founi") // Console log for debugging
+        window.alert("No leads found") // Console log for debugging
         throw error; // Throw the error to trigger useQuery's onError
       }
       
       // Check if there are no events
       if (!data || data.length === 0) {
         window.alert("Nothing found in table")
-        console.log('No events found in the database'); // Console log for debugging
+        console.log('No leads found in the database'); // Console log for debugging
         return [];
       }
   
       // Grab data
-      console.log('Fetched Events:', data);
-      window.alert('Events fetched successfully');
+      console.log('Fetched Leads:', data);
+      window.alert('Leads fetched successfully');
       return data;
   
     } catch (error) {
