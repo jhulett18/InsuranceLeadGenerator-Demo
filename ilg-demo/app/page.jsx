@@ -2,6 +2,7 @@
 import Image from "next/image";
 // import supabase from '@/app/api/supabase';
 import { fetchLeads } from '@/app/api/supabase';
+import  SimpleTable from '@/app/table-animation/table';
 
 const handleButtonClick = async () => {
   fetchLeads();
@@ -55,6 +56,9 @@ export default function Home() {
             Learn More
           </a>
         </div>
+
+        {/* TABLE */}
+        <SimpleTable/>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
