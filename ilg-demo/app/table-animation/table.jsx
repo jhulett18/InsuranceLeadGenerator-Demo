@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from 'react';
 
 // Helper function to create fake data
-const makeData = (count) => {
-  const data = [];
-  for (let i = 0; i < count; i++) {
-    data.push({
-      id: i,
-      firstName: ['John', 'Jane', 'Alex', 'Emma', 'Michael'][Math.floor(Math.random() * 5)],
-      lastName: ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones'][Math.floor(Math.random() * 5)],
-      age: 20 + Math.floor(Math.random() * 50),
-      visits: Math.floor(Math.random() * 100),
-      status: ['Active', 'Pending', 'Inactive'][Math.floor(Math.random() * 3)],
-      progress: Math.floor(Math.random() * 100)
-    });
+const Data = () => {
+  // Retrieve cached data from localStorage
+  const cachedLeads = localStorage.getItem('cachedLeads');
+
+  if (!cachedLeads) {
+    console.warn("No cached data found.");
+    return [];
   }
-  return data;
+  console.log("Cached Data for Table");
+  let leads = JSON.parse(cachedLeads);
+
+  // Select 50 random entries and sort them alphabetically by `employer_name`
+  const selectedLeads = leads
+    .sort(() => 0.5 - Math.random()) // Shuffle the array
+    .slice(0, 25) // Pick first 50 shuffled entries
+    // .sort((a, b) => a.employer_name.localeCompare(b.employer_name)); // Sort alphabetically
+
+  return selectedLeads;
 };
+
 
 const SimpleTable = () => {
   // Generate data only once when component mounts
-  const [initialData] = useState(() => makeData(10));
+  const [initialData] = useState(() => Data());
   const [filteredData, setFilteredData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [animating, setAnimating] = useState(false);
@@ -28,12 +33,13 @@ const SimpleTable = () => {
 
   // Columns definition
   const columns = [
-    { key: 'firstName', label: 'First Name' },
-    { key: 'lastName', label: 'Last Name' },
-    { key: 'age', label: 'Age' },
-    { key: 'visits', label: 'Visits' },
-    { key: 'status', label: 'Status' },
-    { key: 'progress', label: 'Progress' }
+    { key: 'employer_name', label: 'Employer Name' },
+    { key: 'carrier_name', label: 'Carrier Name' },
+    { key: 'employer_city', label: 'Employer City' },
+    { key: 'policy_number', label: 'Policy Number' },
+    { key: 'policy_effective_date', label: 'Effective Date' },
+    { key: 'policy_expiration_date', label: 'Expiration Date' },
+    { key: 'agency_city', label: 'Agency City' }
   ];
 
   // Sorting function
@@ -43,18 +49,18 @@ const SimpleTable = () => {
       direction = 'descending';
     }
     setSortConfig({ key, direction });
-    
+
     // Trigger animation
     setAnimating(true);
   };
 
-  // Filter data
+  // Filter by text
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
     setAnimating(true);
   };
 
-  // Status filter
+  // Filter by status
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
     setAnimating(true);
@@ -64,21 +70,22 @@ const SimpleTable = () => {
   useEffect(() => {
     const applyFiltersAndSort = () => {
       let result = [...initialData];
-      
+
       // Apply text filter
       if (filter) {
         const lowerCaseFilter = filter.toLowerCase();
         result = result.filter(row => 
-          row.firstName.toLowerCase().includes(lowerCaseFilter) ||
-          row.lastName.toLowerCase().includes(lowerCaseFilter)
+          row.employer_name.toLowerCase().includes(lowerCaseFilter) ||
+          row.carrier_name.toLowerCase().includes(lowerCaseFilter) ||
+          row.employer_city.toLowerCase().includes(lowerCaseFilter)
         );
       }
-      
+
       // Apply status filter
       if (statusFilter !== 'all') {
         result = result.filter(row => row.status === statusFilter);
       }
-      
+
       // Apply sorting
       if (sortConfig.key) {
         result.sort((a, b) => {
@@ -91,18 +98,18 @@ const SimpleTable = () => {
           return 0;
         });
       }
-      
+
       setFilteredData(result);
     };
-    
+
     applyFiltersAndSort();
-    
+
     // Reset animation after timeout
     if (animating) {
       const timer = setTimeout(() => {
         setAnimating(false);
       }, 500);
-      
+
       return () => clearTimeout(timer);
     }
   }, [filter, statusFilter, sortConfig, initialData, animating]);
@@ -133,19 +140,27 @@ const SimpleTable = () => {
           />
         </div>
         <div>
-          <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-1">Status:</label>
-          <select
-            id="statusFilter"
-            value={statusFilter}
-            onChange={handleStatusFilterChange}
-            className="p-2 border border-gray-300 rounded"
-          >
-            <option value="all">All</option>
-            <option value="Active">Active</option>
-            <option value="Pending">Pending</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-        </div>
+  <label
+    htmlFor="statusFilter"
+    className="block text-sm font-medium text-gray-700 mb-1 opacity-50 cursor-not-allowed"
+  >
+    Status: disabled
+  </label>
+  {/* Remove opacity and cursor when status filter is implemented */}
+  {/* remove disabled (inside select) when status filter is implemented */}
+  <select
+    id="statusFilter"
+    value={statusFilter}
+    onChange={handleStatusFilterChange} 
+    className="p-2 border border-gray-300 rounded opacity-50 cursor-not-allowed"
+    disabled
+  >
+    <option value="all">All</option>
+    <option value="Active">Active</option>
+    <option value="Pending">Pending</option>
+    <option value="Inactive">Inactive</option>
+  </select>
+</div>
       </div>
       
       <div className="rounded shadow overflow-x-auto">

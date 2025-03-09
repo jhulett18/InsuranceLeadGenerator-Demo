@@ -1,5 +1,5 @@
 import { createClient, setAuth } from '@supabase/supabase-js';
-import { Sign } from 'crypto';
+
 
 // Initialize Supabase client
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_KEY);
@@ -7,36 +7,43 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.
 
 
 export const fetchLeads = async () => {
-    
-  
-  
   try {
-      const {  data, error } = await supabase.from('2025MAYLEADS').select('*');
+    const cachedLeads = localStorage.getItem('cachedLeads');
 
-
-      // Checks for errors
-      if (error) {
-        console.error('Error fetching: ', error);
-        window.alert("No leads found") // Console log for debugging
-        throw error; // Throw the error to trigger useQuery's onError
-      }
-      
-      // Check if there are no events
-      if (!data || data.length === 0) {
-        window.alert("Nothing found in table")
-        console.log('No leads found in the database'); // Console log for debugging
-        return [];
-      }
-  
-      // Grab data
-      console.log('Fetched Leads:', data);
-      window.alert('Leads fetched successfully');
-      return data;
-  
-    } catch (error) {
-      console.error('Unexpected Error:', error); // Console log for debugging
-      throw error; // Throw unexpected errors to trigger useQuery's onError
+    if (cachedLeads) {
+        console.log("Using cached data");
+        return JSON.parse(cachedLeads);
     }
-  };
+
+    const { data, error } = await supabase
+        .from('2025MAYLEADS')
+        .select('employer_name, carrier_name, employer_city, policy_number, policy_effective_date, policy_expiration_date, agency_city');
+
+    // Checks for errors
+    if (error) {
+        console.error('Error fetching: ', error);
+        window.alert("No leads found");
+        throw error;
+    }
+
+    // Check if there are no events
+    if (!data || data.length === 0) {
+        window.alert("Nothing found in table");
+        console.log('No leads found in the database');
+        return [];
+    }
+
+    // Cache the fetched data
+    localStorage.setItem('cachedLeads', JSON.stringify(data));
+
+    window.alert('Leads fetched successfully');
+    return data;
+
+} catch (error) {
+    console.error('Unexpected Error:', error);
+    throw error;
+}
+}
+
 
 
